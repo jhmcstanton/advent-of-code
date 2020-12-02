@@ -38,4 +38,4 @@ correct2 ((R low high c), (P pass)) = lc /= hc && (lc == c || hc == c)
 
 
 solve :: ((Requirement, Password) -> Bool) -> String -> Int
-solve correct = length . filter id . fmap (correct . parse) . lines
+solve correct = length . filter (correct . parse) . lines
