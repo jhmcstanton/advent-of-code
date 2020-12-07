@@ -2,7 +2,6 @@ import           Data.Char                 (isDigit)
 import           Data.List                 (intersperse)
 import qualified Data.Map.Strict    as Map
 import           Data.Map.Strict           (Map)
-import qualified Data.Set           as Set
 import           System.Environment        (getArgs)
 
 main = do
