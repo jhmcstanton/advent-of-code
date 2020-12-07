@@ -9,8 +9,10 @@ main = do
   args     <- getArgs
   contents <- readFile (head args)
   let rules = Map.fromList . fmap parse . lines $ contents
-      bags  = findAll (Color "shiny gold") rules
+      color = Color "shiny gold"
+      bags  = findAll color rules
   print . Map.size $ bags
+  print (internalBags color rules - 1)
 
 newtype Color  = Color String                    deriving (Eq, Ord, Show)
 type    Rule   = (Color, Map Color Int)
@@ -23,9 +25,6 @@ parse s = (mc, foldr (\(n, c) m -> Map.insert c n m) Map.empty . children . drop
   children ("no" : "other" : "bags." : []) = []
   children (num : mod : color : _ : xs)    =
     (read num, Color $ mod ++ " " ++ color) : children xs
-
--- numContains :: Color -> Rules -> Int
--- numContains color rules = Map.size $ findAll color rules
 
 findAll :: Color -> Rules -> Rules
 findAll color rules = Map.filterWithKey (\k _ -> Map.findWithDefault False k filtered) rules where
@@ -40,3 +39,10 @@ findAll color rules = Map.filterWithKey (\k _ -> Map.findWithDefault False k fil
                         then looper (Map.insert c True confirmed) rs
                         else looper (Map.insert c False confirmed) rs
       _              -> looper (Map.insert c True confirmed) rs
+
+-- this count includes the outer Color bag
+internalBags :: Color -> Rules -> Int
+internalBags color rules =
+  1 + (Map.foldr (+) 0 $ Map.mapWithKey (\k v -> v * internalBags k rules) crule)
+  where
+    crule = rules Map.! color
